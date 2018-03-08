@@ -1,7 +1,6 @@
 function socket(http) {
   const io = require('socket.io')(http);
   io.on('connection', function (socket) {
-    console.log(socket.id);
     socket.on('add channel', function (user) {
 
     });
@@ -9,7 +8,6 @@ function socket(http) {
 
     });
     socket.on('send chat', function (data) {
-      console.log(data);
       io.emit('receive chat', data);
     });
     socket.on('receive chat', function (data) {
