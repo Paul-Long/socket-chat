@@ -57,3 +57,11 @@ typings/
 # dotenv environment variables file
 .env
 
+.idea/codeStyles/
+.idea/dbnavigator.xml
+.idea/inspectionProfiles/
+.idea/modules.xml
+.idea/socket-chat.iml
+.idea/vcs.xml
+.idea/workspace.xml
+package-lock.json
