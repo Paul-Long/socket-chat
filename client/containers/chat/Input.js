@@ -3,16 +3,18 @@ import PropTypes from 'prop-types';
 
 class ChatInput extends React.PureComponent {
   render() {
-    const {prefixCls} = this.context;
+    const {prefixCls, saveRef} = this.context;
     return (
-      <div className={`${prefixCls}-input`} contentEditable>
-
-      </div>
+      <div className={`${prefixCls}-input`}
+           ref={saveRef('input')}
+           contentEditable
+      />
     )
   }
 }
 
 export default ChatInput;
 ChatInput.contextTypes = {
-  prefixCls: PropTypes.string
+  prefixCls: PropTypes.string,
+  saveRef: PropTypes.func
 };

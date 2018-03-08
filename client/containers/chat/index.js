@@ -1,21 +1,25 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import io from 'socket.io-client';
-import Content from './Content';
+import Content from './content';
 import Tool from './tool';
 import Input from './Input';
-import Control from './Control';
+import Control from './control';
 import './style';
 
 class Chat extends React.PureComponent {
   state = {
     message: [],
-    value: ''
+    value: '',
+    socketID: ''
   };
 
   getChildContext() {
     return {
-      prefixCls: this.props.prefixCls
+      prefixCls: this.props.prefixCls,
+      socketID: this.state.socketID,
+      send: this.handleSend,
+      saveRef: this.saveRef
     }
   }
 
@@ -25,12 +29,26 @@ class Chat extends React.PureComponent {
       let message = this.state.message;
       this.setState({message: message.concat([msg])});
     });
+    socket.on('connect', () => {
+      this.setState({socketID: socket.id});
+    });
     this.socket = socket;
   }
 
-  handleClick = () => {
-    this.socket.emit('send chat', this.state.value);
-    this.setState({value: ''});
+  handleSend = () => {
+    const html = this['input'].innerHTML || '';
+    if (!html) {
+      return false;
+    }
+    this.socket.emit('send chat', {
+      socketID: this.state.socketID,
+      html
+    });
+    this['input'].innerHTML = '';
+  };
+
+  saveRef = (name) => (node) => {
+    this[name] = node;
   };
 
   render() {
@@ -54,5 +72,8 @@ Chat.defaultProps = {
   prefixCls: 'pl-chat'
 };
 Chat.childContextTypes = {
-  prefixCls: PropTypes.string
+  prefixCls: PropTypes.string,
+  socketID: PropTypes.string,
+  send: PropTypes.func,
+  saveRef: PropTypes.func
 };
