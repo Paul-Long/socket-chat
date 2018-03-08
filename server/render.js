@@ -29,7 +29,7 @@ const render = (chunks) => {
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta name="theme-color" content="#000000">
   <link rel="shortcut icon" href="/favicon.ico">
-  <title>React</title>
+  <title>Socket.IO Chat</title>
   ${css.map(path => `<link rel="stylesheet" href="/${path}" />`).join('\n') }
   </head>
   <body>
