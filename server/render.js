@@ -1,4 +1,4 @@
-const order = ['manifest', 'common', 'common-main', 'vendor', 'main'];
+const order = ['runtime', 'common', 'vendor', 'main'];
 
 const toArray = (chunk) => {
   return Array.isArray(chunk) ? chunk : [chunk];

@@ -1,14 +1,13 @@
 const webpack = require('webpack');
 const path = require('path');
+const fs = require('fs');
 const cpus = require('os').cpus().length;
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HappyPack = require('happypack');
 const WebpackMd5Hash = require('webpack-md5-hash');
 const happyThreadPool = HappyPack.ThreadPool({size: cpus});
-const ParallelUglifyPlugin = require('webpack-parallel-uglify-plugin');
 const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 const CleanPlugin = require('clean-webpack-plugin');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const ENV = process.env.NODE_ENV;
 const config = {
@@ -20,7 +19,7 @@ const config = {
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: '[name].[hash:8].[id].js',
+    filename: '[name].[hash:8].js',
     publicPath: '/'
   },
   resolve: {
@@ -44,7 +43,8 @@ const config = {
         include: [
           path.resolve(__dirname, 'client')
         ],
-        loader: 'babel-loader',
+        loader: 'babel-loader'
+        // loader: 'happypack/loader?id=js'
       }, {
         test: /\.(less|css)$/,
         use: ExtractTextPlugin.extract({
@@ -78,30 +78,30 @@ const config = {
     new CleanPlugin([path.resolve(__dirname, 'dist')], {verbose: true}),
     new ExtractTextPlugin({filename: '[name].[contenthash:8].css', allChunks: true}),
     new webpack.optimize.ModuleConcatenationPlugin(),
-    new webpack.optimize.OccurrenceOrderPlugin,
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify(ENV)
     }),
-    // new webpack.optimize.SplitChunksPlugin({
-    //   chunks: 'all',
-    //   minSize: 30000,
-    //   minChunks: 1,
-    //   maxAsyncRequests: 5,
-    //   maxInitialRequests: 3,
-    //   name: true,
-    //   cacheGroups: {
-    //     default: {
-    //       minChunks: 2,
-    //       priority: -20,
-    //       reuseExistingChunk: true,
-    //     },
-    //     vendors: {
-    //       test: /[\\/]node_modules[\\/]/,
-    //       priority: -10
-    //     }
-    //   }
-    // })
+    new webpack.LoaderOptionsPlugin({
+      minimize: ENV === 'production'
+    }),
+    new HappyPack({
+      id: 'js',
+      threadPool: happyThreadPool,
+      loaders: ['babel-loader']
+    }),
+    new webpack.HashedModuleIdsPlugin(),
   ]
+};
+config.optimization = {
+  splitChunks: {
+    chunks: 'all',
+    name: 'common',
+    minSize: 0,
+    minChunks: 1
+  },
+  runtimeChunk: {
+    name: 'runtime'
+  }
 };
 if (ENV === 'development') {
   config.devtool = 'eval-source-map';
@@ -110,28 +110,23 @@ if (ENV === 'development') {
 }
 
 if (ENV === 'production') {
-  const UglifyJs = new ParallelUglifyPlugin({
-    cacheDir: '.cache/',
-    uglifyJS: {
-      output: {
-        comments: false
-      },
-      compress: {
-        warnings: false
-      }
-    }
-  });
-  config.plugins.push(UglifyJs,
-    function () {
-      this.plugin('done', function (stats) {
-        require('fs').writeFileSync(path.join(config.output.path, '/chunkNames.json'), JSON.stringify(stats.toJson().assetsByChunkName, null, 4));
-      })
-    });
+  function DonePlugin() {
+    this.plugin('done', function (stats) {
+      fs.writeFileSync(
+        path.resolve(__dirname, 'dist/chunkNames.json'),
+        JSON.stringify(stats.toJson().assetsByChunkName, null, 4),
+        function (err) {
+          console.error(err);
+        });
+    })
+  }
 
-  // const isTest = true;
-  // if (isTest) {
-  //   const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
-  //   config.plugins.push(new BundleAnalyzerPlugin());
-  // }
+  config.optimization.minimize = true;
+  config.optimization.noEmitOnErrors = true;
+  config.optimization.concatenateModules = true;
+  config.plugins.push(DonePlugin);
+
+  const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+  config.plugins.push(new BundleAnalyzerPlugin());
 }
 module.exports = config;
