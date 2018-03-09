@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import io from 'socket.io-client';
+import Socket from '@socket/client';
 import Content from './content';
 import Tool from './tool';
-import Input from './Input';
+import Input from './input';
 import Control from './control';
 import './style';
 
@@ -11,28 +11,25 @@ class Chat extends React.PureComponent {
   state = {
     message: [],
     value: '',
-    socketID: ''
+    username: '',
+    userNum: 0
   };
 
   getChildContext() {
     return {
       prefixCls: this.props.prefixCls,
-      socketID: this.state.socketID,
       send: this.handleSend,
-      saveRef: this.saveRef
+      saveRef: this.saveRef,
+      join: this.join
     }
   }
 
   componentDidMount() {
-    const socket = io();
-    socket.on('receive chat', (msg) => {
-      let message = this.state.message;
-      this.setState({message: message.concat([msg])});
-    });
-    socket.on('connect', () => {
-      this.setState({socketID: socket.id});
-    });
-    this.socket = socket;
+    this.socket = Socket()
+      .channel('聊天室', msg => {
+        const message = this.state.message;
+        this.setState({message: message.concat([msg])});
+      });
   }
 
   handleSend = () => {
@@ -40,11 +37,18 @@ class Chat extends React.PureComponent {
     if (!html) {
       return false;
     }
-    this.socket.emit('send chat', {
-      socketID: this.state.socketID,
+    this.socket.emit({
+      username: this.state.username,
       html
     });
     this['input'].innerHTML = '';
+  };
+
+  join = (userName) => {
+    this.socket.join(userName, data => {
+      this['inputMask'].style.display = 'none';
+      this.setState(data);
+    });
   };
 
   saveRef = (name) => (node) => {
@@ -73,7 +77,7 @@ Chat.defaultProps = {
 };
 Chat.childContextTypes = {
   prefixCls: PropTypes.string,
-  socketID: PropTypes.string,
   send: PropTypes.func,
-  saveRef: PropTypes.func
+  saveRef: PropTypes.func,
+  join: PropTypes.func
 };

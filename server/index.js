@@ -3,7 +3,8 @@ const app = express();
 const http = require('http').Server(app);
 const render = require('./render');
 const fs = require('fs');
-const socket = require('./socket');
+// const socket = require('./socket');
+const Socket = require('../socket/server');
 const webpackConfig = require('../webpack.config');
 let chunks = [];
 const isDev = process.env.NODE_ENV === 'development';
@@ -34,4 +35,5 @@ app.get('/**', function (req, res) {
 http.listen(3838, function () {
   console.log('listening on http://localhost:3838/');
 });
-socket(http);
+// socket(http);
+Socket(http);

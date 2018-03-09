@@ -7,7 +7,7 @@ class Item extends React.PureComponent {
     const {prefixCls} = this.context;
     return (
       <div className={`${prefixCls}-content-item`}>
-        <div>{`${content.socketID} : `}</div>
+        <div>{`${content.username} : `}</div>
         <div dangerouslySetInnerHTML={{__html: content.html}} />
       </div>
     )
@@ -16,6 +16,5 @@ class Item extends React.PureComponent {
 
 export default Item;
 Item.contextTypes = {
-  prefixCls: PropTypes.string,
-  socketID: PropTypes.string
+  prefixCls: PropTypes.string
 };

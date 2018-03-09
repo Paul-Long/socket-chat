@@ -32,7 +32,8 @@ const config = {
       '@client': path.resolve(__dirname, 'client'),
       '@containers': path.resolve(__dirname, 'client/containers'),
       '@components': path.resolve(__dirname, 'client/components'),
-      '@styles': path.resolve(__dirname, 'client/styles')
+      '@styles': path.resolve(__dirname, 'client/styles'),
+      '@socket': path.resolve(__dirname, 'socket'),
     }
   },
   module: {
