@@ -21,7 +21,8 @@ if (isDev) {
     aggregateTimeout: 300,
     poll: true,
     stats: {
-      chunks: false
+      chunks: false,
+      colors: true
     }
   }));
   app.use(webpackHotMiddleWare(compiler));
