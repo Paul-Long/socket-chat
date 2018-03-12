@@ -75,6 +75,7 @@
     "webpack-dev-middleware": "^3.0.1",
     "webpack-hot-middleware": "^2.21.2",
     "webpack-md5-hash": "0.0.6",
+    "webpack-merge": "^4.1.2",
     "webpack-spritesmith": "^0.4.0"
   }
 }
