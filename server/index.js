@@ -26,7 +26,7 @@ if (isDev) {
   }));
   app.use(webpackHotMiddleWare(compiler));
 } else {
-  chunks = JSON.parse(fs.readFileSync(config.output.path + '/chunkNames.json'));
+  chunks = JSON.parse(fs.readFileSync(config.output.path + '/chunkNames.json')).assetsByChunkName;
 }
 
 app.use(express.static(config.output.path));

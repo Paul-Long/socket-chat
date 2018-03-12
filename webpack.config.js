@@ -8,6 +8,7 @@ const WebpackMd5Hash = require('webpack-md5-hash');
 const happyThreadPool = HappyPack.ThreadPool({size: cpus});
 const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 const CleanPlugin = require('clean-webpack-plugin');
+const StatsOutPlugin = require('stats-out-plugin');
 
 const ENV = process.env.NODE_ENV;
 
@@ -120,25 +121,15 @@ if (ENV === 'development') {
 }
 
 if (ENV === 'production') {
-  function DonePlugin() {
-    this.plugin('done', function (stats) {
-      fs.writeFileSync(
-        path.resolve(__dirname, 'dist/chunkNames.json'),
-        JSON.stringify(stats.toJson().assetsByChunkName, null, 4),
-        function (err) {
-          console.error(err);
-        });
-    })
-  }
-
   config.optimization.minimize = true;
   config.optimization.noEmitOnErrors = true;
   config.optimization.concatenateModules = true;
 
-  config.plugins.push(DonePlugin);
+  const stats = new StatsOutPlugin('chunkNames.json', {});
+  config.plugins.push(stats);
 
-  const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
-  config.plugins.push(new BundleAnalyzerPlugin());
+  // const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+  // config.plugins.push(new BundleAnalyzerPlugin());
 }
 
 module.exports = config;
