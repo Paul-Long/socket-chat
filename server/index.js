@@ -3,7 +3,7 @@ const app = express();
 const http = require('http').Server(app);
 const render = require('./render');
 const fs = require('fs');
-const Socket = require('../socket/server');
+const Socket = require('simple-socketio/server');
 const config = require('../webpack.config');
 
 let chunks = [];

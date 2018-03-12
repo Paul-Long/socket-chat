@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Socket from '@socket/client';
+import Socket from 'simple-socketio/client';
 import Content from './content';
 import Tool from './tool';
 import Input from './input';
